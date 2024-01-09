@@ -29,4 +29,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: flutter-apk
-        path: build/app/app-release.apk  # 修改为你的 APK 路径
+        path: android/app-release.apk  # 修改为你的 APK 路径

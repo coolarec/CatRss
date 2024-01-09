@@ -1,49 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../common/count.dart';
+import '../routes/setting.dart';
+import 'article_card.dart';
 
-final Controller c = Controller();
+Controller c = Get.find();
 
 class IndexInfo extends StatelessWidget {
-  const IndexInfo({Key? key}) : super(key: key);
-
+  const IndexInfo({Key? key, required this.groupId}) : super(key: key);
+  final int groupId;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
-            const SliverAppBar(
+            SliverAppBar(
               pinned: true,
-              expandedHeight: 500,
+              expandedHeight: 350,
               flexibleSpace: FlexibleSpaceBar(
-                title: Text(
+                title: const Text(
                   '你好👌',
                   textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.black54),
                 ),
-                background: Center(
-                  child: Icon(
-                    Icons.navigation,
-                    size: 300,
+                background: GestureDetector(
+                  onLongPress: () {
+                    Get.to(
+                      const NewRoute(),
+                      transition: Transition.downToUp,
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.fastOutSlowIn,
+                    );
+                  },
+                  onTap: () => c.increment(),
+                  child: const Center(
+                    child: BlueGradientProgress(finish: 1.5, all: 2),
                   ),
                 ),
               ),
             ),
           ];
         },
-        body: const Column(
+        body: Column(
           children: [
             Expanded(
               child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    IndexArticles(),
-                    Text(
-                      '已经到头了哦',
-                      style: TextStyle(height: 5),
-                    ),
-                  ],
-                ),
+                child: IndexArticles(groupId: groupId),
               ),
             ),
           ],
@@ -53,93 +56,86 @@ class IndexInfo extends StatelessWidget {
   }
 }
 
+class BlueGradientProgress extends StatelessWidget {
+  const BlueGradientProgress({
+    Key? key,
+    required this.finish,
+    required this.all,
+  }) : super(key: key);
+
+  final double finish; // 完成进度
+  final double all; // 总进度
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 150,
+      height: 150,
+      child: CustomPaint(
+        painter: ProgressPainter(finish: finish, all: all),
+      ),
+    );
+  }
+}
+
+class ProgressPainter extends CustomPainter {
+  ProgressPainter({
+    required this.finish,
+    required this.all,
+  });
+
+  final double finish; // 完成进度
+  final double all; // 总进度
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint bgPaint = Paint()
+      ..color = Colors.grey.withOpacity(0.2)
+      ..strokeWidth = 20
+      ..style = PaintingStyle.stroke;
+
+    final Paint progressPaint = Paint()
+      ..strokeWidth = 20
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    final Gradient gradient = LinearGradient(
+      colors: [Colors.blue.shade50, Colors.blue.shade900],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+
+    final double sweepAngle = 2 * 3.14 * (finish / all);
+
+    final Rect rect = Rect.fromCircle(
+        center: size.center(Offset.zero), radius: size.width / 2);
+
+    progressPaint.shader = gradient.createShader(rect);
+
+    canvas.drawArc(rect, -1.57, sweepAngle, false, progressPaint);
+    canvas.drawCircle(size.center(Offset.zero), size.width / 2, bgPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
 class IndexArticles extends StatelessWidget {
-  const IndexArticles({Key? key}) : super(key: key);
+  final int groupId;
+  const IndexArticles({Key? key, required this.groupId}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Scrollbar(
         child: Container(
-            decoration: BoxDecoration(
-              color: const Color.fromRGBO(255, 255, 255, 0.5),
-              borderRadius: BorderRadius.circular(15.0),
+            decoration: const BoxDecoration(
+              color: Color.fromRGBO(255, 255, 255, 0.5),
             ),
-            margin: const EdgeInsets.all(10.0),
+            margin: const EdgeInsets.all(30.0),
             padding: const EdgeInsets.all(10.0),
-            child: const ArticleCard()),
-      ),
-    );
-  }
-}
-
-class ArticleCard extends StatelessWidget {
-  const ArticleCard({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(
-      () => ListView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: c.count.value,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            decoration: BoxDecoration(
-              color: Colors.white54.withOpacity(0.1),
-            ),
-            margin: const EdgeInsets.all(5),
-            child: ListTile(
-              title: Text('你好 $index'),
-              subtitle: const Text(
-                'ListTile 通常用于在Flutter 中填充ListView。在这篇文章中，我将用可视化的例子来说明所有的参数。将图像或图标添加到列表的开头。',
-              ),
-              enabled: true,
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class BottomBar extends StatelessWidget {
-  const BottomBar({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return BottomAppBar(
-      height: 80,
-      color: Colors.white,
-      shape: const CircularNotchedRectangle(),
-      padding: const EdgeInsets.all(10),
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          SizedBox(
-            width: 60,
-            height: 60,
-            child: IconButton(
-              icon: const Icon(Icons.home),
-              onPressed: () => {c.increment()},
-            ),
-          ),
-          SizedBox(
-            width: 60,
-            height: 60,
-            child: IconButton(
-              icon: const Icon(Icons.home),
-              onPressed: () => {c.increment()},
-            ),
-          ),
-          SizedBox(
-            width: 60,
-            height: 60,
-            child: IconButton(
-              icon: const Icon(Icons.home),
-              onPressed: () => {c.increment()},
-            ),
-          ),
-        ],
+            child: ArticleCard(groupId: groupId)),
       ),
     );
   }

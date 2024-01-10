@@ -53,6 +53,7 @@ class NewRoute extends StatelessWidget {
   }
 }
 
+//设置主窗口
 class SettingContent extends StatelessWidget {
   const SettingContent({Key? key}) : super(key: key);
   @override

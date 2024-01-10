@@ -1,32 +1,47 @@
-name: Build and Package Flutter APK
+# main.yml
+# 自动构建 Apk
+name: Test, Build and Release apk
 
+# 工作流程触发的时机，这里是当一个版本标签推送到仓库时触发
 on:
   push:
-    branches:
-      - main  # 触发分支
+    tags:
+      - v*
 
+# 这个工作流程需要执行的任务
 jobs:
-  build:
-    name: Build
+  process:
+    name: all process
     runs-on: ubuntu-latest
-
+    # 这个任务的步骤
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Set up Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '2.10.0'  # 设置你想要使用的 Flutter 版本
-
-    - name: Get dependencies
-      run: flutter pub get
-
-    - name: Build APK
-      run: flutter build apk
-
-    - name: Archive APK
-      uses: actions/upload-artifact@v2
-      with:
-        name: flutter-apk
-        path: build/app/outputs/flutter-apk/app-release.apk  # 修改为你的 APK 路径
+      # 拉取项目代码
+      - uses: actions/checkout@v2
+      # 建立 java 环境
+      - name: Setup Java JDK
+        uses: actions/setup-java@v1.4.3
+        with:
+          java-version: "12.x"
+      # 建立 Flutter 环境
+      - name: Flutter action
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          flutter-version: "3.0.0"
+      # 下载项目依赖
+      - run: flutter pub get
+      - run: echo $ENCODED_KEYSTORE | base64 -di > android/app/keystore.jks
+        env:
+          ENCODED_KEYSTORE: ${{ secrets.ENCODED_KEYSTORE }}
+      # 打包 APK
+      - run: flutter build apk --release
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD}}
+      # 发布到 Release
+      - name: Release apk
+        uses: ncipollo/release-action@v1.5.0
+        with:
+          artifacts: "build/app/outputs/apk/release/*.apk"
+          token: ${{ secrets.RELEASE_TOKEN }}

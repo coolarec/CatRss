@@ -1,0 +1,32 @@
+name: Build and Package Flutter APK
+
+on:
+  push:
+    branches:
+      - main  # 触发分支
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '2.10.0'  # 设置你想要使用的 Flutter 版本
+
+    - name: Get dependencies
+      run: flutter pub get
+
+    - name: Build APK
+      run: flutter build apk
+
+    - name: Archive APK
+      uses: actions/upload-artifact@v2
+      with:
+        name: flutter-apk
+        path: build/app/outputs/flutter-apk/app-release.apk  # 修改为你的 APK 路径

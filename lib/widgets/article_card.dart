@@ -18,9 +18,7 @@ class ArticleCard extends StatelessWidget {
             itemCount: c.articleCounts[groupId],
             itemBuilder: (BuildContext context, int index) {
               return Container(
-                decoration: BoxDecoration(
-                  color: Colors.white70.withOpacity(0.1),
-                ),
+                decoration: const BoxDecoration(),
                 child: ListTile(
                   title: Text('你好 $index'),
                   subtitle: const Text(

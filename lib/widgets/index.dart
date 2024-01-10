@@ -16,7 +16,10 @@ class IndexInfo extends StatelessWidget {
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverAppBar(
+              backgroundColor: const Color(0xffF0F0F0),
+              surfaceTintColor: const Color(0xffF0F0F0),
               pinned: true,
+              toolbarHeight: 60,
               expandedHeight: 350,
               flexibleSpace: FlexibleSpaceBar(
                 title: const Text(
@@ -42,14 +45,17 @@ class IndexInfo extends StatelessWidget {
             ),
           ];
         },
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: IndexArticles(groupId: groupId),
+        body: Container(
+          color: const Color(0xffF0F0F0),
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: IndexArticles(groupId: groupId),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -22,3 +22,9 @@ flutter:
     - family: harry
       fonts:
         - asset: fonts/ParryHotter.ttf
+    - family: stitle
+      fonts:
+        - asset: fonts/LinHaiLiShu.ttf
+    - family: sword
+      fonts:
+        - asset: fonts\MiSans-Medium.ttf
